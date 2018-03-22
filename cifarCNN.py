@@ -49,16 +49,25 @@ model.add(Convolution2D(32, 3, 3, input_shape=(32,32,3), border_mode='same', act
 model.add(Dropout(0.2))
 model.add(Convolution2D(32, 3, 3, activation='relu', border_mode='same', W_constraint=maxnorm(3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same', W_constraint=maxnorm(3)))
+model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same'))
+model.add(Dropout(0.2))
+model.add(Convolution2D(64, 3, 3, activation='relu', border_mode='same'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
+model.add(Dropout(0.2))
+model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Flatten())
+model.add(Dropout(0.2))
+model.add(Dense(1024, activation='relu', W_constraint=maxnorm(3)))
+model.add(Dropout(0.2))
 model.add(Dense(512, activation='relu', W_constraint=maxnorm(3)))
-model.add(Dropout(0.5))
+model.add(Dropout(0.2))
 model.add(Dense(num_classes, activation='softmax'))
 
 # Compile model
-epochs = 25
-lrate = 0.03
+epochs = 50
+lrate = 0.01
 decay = lrate/epochs
 sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])

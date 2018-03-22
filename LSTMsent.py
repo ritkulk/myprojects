@@ -13,6 +13,8 @@ from keras.layers import LSTM
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 from keras.layers import Dropout
+from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import MaxPooling1D
 
 # fix random seed for reproducibility
 numpy.random.seed(7)
@@ -30,9 +32,9 @@ X_test = sequence.pad_sequences(X_test, maxlen=max_review_length)
 embedding_vecor_length = 32
 model = Sequential()
 model.add(Embedding(top_words, embedding_vecor_length, input_length=max_review_length))
-model.add(Dropout(0.2))
+model.add(Conv1D(filters=32, kernel_size=1, padding='same', activation='relu'))
+model.add(MaxPooling1D(pool_size=2))
 model.add(LSTM(100))
-model.add(Dropout(0.2))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
