@@ -17,7 +17,7 @@ a) batch_size = 100
 b) epoch = 20
 c) n_folds = 10
 
-The folder structure of the project is as follows:
+The folder structure of the project is as follows:  
 -factmata/  
 --setup.py  
 --requirements.txt  
