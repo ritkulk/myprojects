@@ -1,4 +1,4 @@
-*Subjectivity Classifier
+*Subjectivity Classifier*
 
 This project builds a binary classifier model to predict whether a sentence is subjective or objective. Sentences are obtained from the dataset released by Pang et.al, available here: http://www.cs.cornell.edu/people/pabo/movie-review-data/. Refer to the documentation for more details.
 
@@ -19,6 +19,7 @@ c) n_folds = 10
 
 The folder structure of the project is as follows:
 -factmata/
+
 --setup.py
 --requirements.txt
 --README.md
