@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Mar 23 04:45:33 2018
-
+Contains modules to related to the model. Compile, train, evaluate, predict and 
+other necessary functions
 @author: rtwik
 """
 
@@ -25,7 +26,8 @@ class Models(object):
     def __init__(self):
         pass
     
-    def compile_conv_bilstm_model(self,params):
+    def compile_conv_lstm_model(self,params):
+        # builds a CNN + LSTM network
         sent_maxlen = params['sent_maxlen']
         vocab_size = params['vocab_size']
         
@@ -53,6 +55,7 @@ class Models(object):
     
     
     def compile_multi_cnn(self, params):
+        # builds a multi-channel CNN network
         sent_maxlen = params['sent_maxlen']
         vocab_size = params['vocab_size']
         # channel 1
@@ -92,7 +95,7 @@ class Models(object):
         return model
     
     def train_model(self, model, data_gen_train, data_gen_test,params):
-    
+        #train model and save best model bases on validation accuracy
         filepath = params['models_dir']+params['model_name']
         CP=ModelCheckpoint(filepath, monitor='val_acc', 
                                verbose=1, save_best_only=True, mode='auto')
@@ -104,12 +107,13 @@ class Models(object):
         model.fit_generator(data_gen_train,steps_per_epoch=train_steps,
                             validation_data = data_gen_test,
                             validation_steps=eval_steps,
-                            epochs=20,callbacks=[CP])
+                            epochs=params['epochs'],callbacks=[CP])
         
         return model
 
     
     def evaluate_model(self,model,data_gen,params):
+        # evaluate model
         print('Evaluating model')
         eval_steps = params['eval_steps']
 
@@ -117,6 +121,7 @@ class Models(object):
         return scores
 
     def load_model(self,model_name,params):
+        # load saved model
         print('Loading model')
         filepath = params['models_dir']+model_name
         model = load_model(filepath)

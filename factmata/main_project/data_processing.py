@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu- Mar 22 00:38:28 2018
-
+modules necessary to pre-process data and prepare to be fed into the model
+Also contains module for the evaluation metrics
 @author: rtwik
 """
 
-import os
 import re
 import pandas as pd
 import numpy
@@ -19,18 +19,21 @@ class preprocess(object):
         pass
         
     def get_raw_data(self,data_dir,filenames,category):
+        # get raw data from file
         with open(data_dir + filenames[category],'rb') as datafile:
             data_raw = datafile.readlines()
             
         return data_raw        
     
     def get_stopwords(self):
+        # make a list of stopwords
         stops = set(stopwords.words('english'))
         
         return stops
         
     def alphanumeric_and_split_text(self,text,keep_stops=False):  
-        
+        # filter text to keep only alpha-numeric characters and split sentences
+        # into words
         if not keep_stops:
             stops = self.get_stopwords()
         else:
@@ -43,6 +46,7 @@ class preprocess(object):
         return words
     
     def get_vocab(self,data):
+        # makes a set of all the words in the data
         vocab = set()
         for sent in data:
             vocab = vocab | set(self.alphanumeric_and_split_text(sent.lower()))
@@ -50,17 +54,19 @@ class preprocess(object):
         return vocab
     
     def build_word_to_id(self,vocab):
-        # index 0 is reserved for padding
+        # builds index for the vocab. index 0 is reserved for padding
         word_to_id = dict((c, i + 1) for i, c in enumerate(vocab))
         
         return word_to_id
     
     def get_max_sent_len(self,data):
+        # claculates the maximum words in a sentence
         sent_maxlen = max([len(sent) for sent in data])
         return sent_maxlen
     
     
     def get_tokenised_data(self,data):
+        # tokenises the data
         data_tokenised = [self.alphanumeric_and_split_text(sent.lower())
                             for sent in data]
         
@@ -68,6 +74,7 @@ class preprocess(object):
 
 
     def vectorize_data(self,data_X,data_Y,params):
+        # transforms sentences into vectors 
         X = []
         
         sent_maxlen = params['sent_maxlen']
@@ -82,13 +89,24 @@ class preprocess(object):
                                                                     dtype=int))
 
     def make_train_test_split(self,data_frame,ratio):
+        # splits the data into train and test
         data_frame = data_frame.sample(frac=1)
         data_train = data_frame.iloc[:int(len(data_frame)*ratio)]
         data_test = data_frame.iloc[int(len(data_frame)*ratio):]
         
         return data_train, data_test
+    
+    def get_targets_for_eval(self, data_iter, stop_len):
+        # gets targets to evaluate metrics over predictions
+        targets = []
+        for i in data_iter:
+            targets = targets + [i[1][0]]
+            if len(targets)==stop_len:
+                break
+        return targets
 
 class data_gen(preprocess):
+    # iterator object to stream data to the model
     def __init__(self,data,params):
         preprocess.__init__(self)
         self.data = data
@@ -100,26 +118,29 @@ class data_gen(preprocess):
         return self
         
     def __next__(self):
-#        while True:
-            data_steps = int(len(self.data)/self.batch_size)+1
-            for i in range(data_steps):
-                start_ind = i*self.batch_size
-                end_ind = (i+1)*self.batch_size
-                
-                if end_ind > len(self.data):
-                    end_ind = len(self.data)
-                
-                data_batch = self.data.iloc[start_ind: end_ind]
-                
-                data_tokenised = self.get_tokenised_data(data_batch['sent'])
-                
-                X,Y=self.vectorize_data(data_tokenised, data_batch['label'],
-                                                 self.params)
+        data_steps = int(len(self.data)/self.batch_size)+1
+        for i in range(data_steps):
+            start_ind = i*self.batch_size
+            end_ind = (i+1)*self.batch_size
+            
+            if end_ind > len(self.data):
+                end_ind = len(self.data)
+            
+            data_batch = self.data.iloc[start_ind: end_ind]
+            
+            data_tokenised = self.get_tokenised_data(data_batch['sent'])
+            
+            X,Y=self.vectorize_data(data_tokenised, data_batch['label'],
+                                             self.params)
+            if self.params['model_type'] == 'multi_cnn':
                 return ([X,X,X],[Y])
+            if self.params['model_type'] == 'cnn_lstm':
+                return (X,Y)
 
 
 
 class binary_labelled_data(preprocess):
+    # creates binary labels for subjective and objective data
     def __init__(self):
         preprocess.__init__(self)
 
@@ -153,6 +174,7 @@ class binary_labelled_data(preprocess):
         return data_frame
 
 class metrics(object):
+    # module to get precision, recall and fscore over predictions
     def __init__(self):
         pass
     
