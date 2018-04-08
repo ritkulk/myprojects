@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Mar 23 04:45:33 2018
-Contains modules to related to the model. Compile, train, evaluate, predict and 
+Contains modules to related to the model. Compile, train, evaluate, predict and
 other necessary functions
 @author: rtwik
 """
@@ -25,15 +25,15 @@ numpy.random.seed(7)
 class Models(object):
     def __init__(self):
         pass
-    
-    def compile_conv_lstm_model(self,params):
+
+    def compile_conv_lstm_model(self, params):
         # builds a CNN + LSTM network
         sent_maxlen = params['sent_maxlen']
         vocab_size = params['vocab_size']
-        
+
         model = None
         model = Sequential()
-        model.add(Embedding(input_dim = vocab_size +1, output_dim = 128, 
+        model.add(Embedding(input_dim=vocab_size + 1, output_dim=128,
                             input_length=sent_maxlen))
         model.add(Conv1D(filters=1000, kernel_size=1, padding='same',
                          activation='relu'))
@@ -41,26 +41,25 @@ class Models(object):
         model.add(MaxPooling1D(pool_size=2))
         model.add(Dropout(0.5))
 #        model.add(Bidirectional(LSTM(64,dropout=0.5,recurrent_dropout=0.5)))
-        model.add(LSTM(128,dropout=0.5,recurrent_dropout=0.5))
+        model.add(LSTM(128, dropout=0.5, recurrent_dropout=0.5))
 
         model.add(Dropout(0.5))
-        model.add(Dense(128,activation='relu'))
+        model.add(Dense(128, activation='relu'))
         model.add(Dropout(0.5))
         model.add(Dense(1, activation='sigmoid'))
-        
-        model.compile(loss='binary_crossentropy', optimizer='adam', 
+
+        model.compile(loss='binary_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
-    
+
         return model
-    
-    
+
     def compile_multi_cnn(self, params):
         # builds a multi-channel CNN network
         sent_maxlen = params['sent_maxlen']
         vocab_size = params['vocab_size']
         # channel 1
         inputs1 = Input(shape=(sent_maxlen,))
-        embedding1 = Embedding(vocab_size, 100)(inputs1)
+        embedding1 = Embedding(vocab_size + 1, 128)(inputs1)
         conv1 = Conv1D(filters=640, kernel_size=1, activation='relu',
                        padding='same')(embedding1)
         drop1 = Dropout(0.5)(conv1)
@@ -68,7 +67,7 @@ class Models(object):
         flat1 = Flatten()(pool1)
         # channel 2
         inputs2 = Input(shape=(sent_maxlen,))
-        embedding2 = Embedding(vocab_size, 100)(inputs2)
+        embedding2 = Embedding(vocab_size + 1, 128)(inputs2)
         conv2 = Conv1D(filters=640, kernel_size=3, activation='relu',
                        padding='same')(embedding2)
         drop2 = Dropout(0.5)(conv2)
@@ -76,7 +75,7 @@ class Models(object):
         flat2 = Flatten()(pool2)
         # channel 3
         inputs3 = Input(shape=(sent_maxlen,))
-        embedding3 = Embedding(vocab_size, 100)(inputs3)
+        embedding3 = Embedding(vocab_size + 1, 128)(inputs3)
         conv3 = Conv1D(filters=640, kernel_size=5, activation='relu',
                        padding='same')(embedding3)
         drop3 = Dropout(0.5)(conv3)
@@ -90,29 +89,28 @@ class Models(object):
         outputs = Dense(1, activation='sigmoid')(dense1)
         model = Model(inputs=[inputs1, inputs2, inputs3], outputs=outputs)
         # compile
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss='binary_crossentropy', optimizer='adam',
+                      metrics=['accuracy'])
 
         return model
-    
-    def train_model(self, model, data_gen_train, data_gen_test,params):
-        #train model and save best model bases on validation accuracy
+
+    def train_model(self, model, data_gen_train, data_gen_test, params):
+        # train model and save best model bases on validation accuracy
         filepath = params['models_dir']+params['model_name']
-        CP=ModelCheckpoint(filepath, monitor='val_acc', 
-                               verbose=1, save_best_only=True, mode='auto')
-        
-        
+        CP = ModelCheckpoint(filepath, monitor='val_acc',
+                             verbose=1, save_best_only=True, mode='auto')
+
         train_steps = params['train_steps']
         eval_steps = params['eval_steps']
-        
-        model.fit_generator(data_gen_train,steps_per_epoch=train_steps,
-                            validation_data = data_gen_test,
+
+        model.fit_generator(data_gen_train, steps_per_epoch=train_steps,
+                            validation_data=data_gen_test,
                             validation_steps=eval_steps,
-                            epochs=params['epochs'],callbacks=[CP])
-        
+                            epochs=params['epochs'], callbacks=[CP])
+
         return model
 
-    
-    def evaluate_model(self,model,data_gen,params):
+    def evaluate_model(self, model, data_gen, params):
         # evaluate model
         print('Evaluating model')
         eval_steps = params['eval_steps']
@@ -120,10 +118,10 @@ class Models(object):
         scores = model.evaluate_generator(data_gen, steps=eval_steps)
         return scores
 
-    def load_model(self,model_name,params):
+    def load_model(self, model_name, params):
         # load saved model
         print('Loading model')
         filepath = params['models_dir']+model_name
         model = load_model(filepath)
-        
+
         return model
