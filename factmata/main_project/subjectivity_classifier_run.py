@@ -45,7 +45,7 @@ params = {'batch_size': 100,
           'vocab_size': vocab_size, 'word_to_id': word_to_id,  # index
           'data_dir': data_dir, 'models_dir': models_dir,
           'model_name': 'subj_classifier.h5',
-          'model_type': 'multi_cnn',  # 'cnn_lstm' or 'multi_cnn'
+          'model_type': 'cnn_lstm',  # 'cnn_lstm' or 'multi_cnn'
           'epochs': 20
           }
 
