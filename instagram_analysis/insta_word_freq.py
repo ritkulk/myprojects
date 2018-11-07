@@ -11,7 +11,7 @@ import pandas as pd
 from nltk.corpus import stopwords
 import re
 from collections import Counter
-import spacy
+import gensim
 
 class preprocess(object):
 
@@ -69,11 +69,28 @@ class preprocess(object):
 
         return sorted_freq[-n_words:]
 
+    def get_correlated_words(self, top_words, freqs, model):
+        words_t = [i[1] for i in top_words]
+        top_corr = {}
+        for w in freqs.keys():
+            w_corr = []
+            for w_t in words_t:
+                if w in model and w_t in model:
+                    if model.similarity(w, w_t) > 0.5:
+                        if w_t in top_corr:
+                            w_corr = top_corr[w_t]
+                            w_corr.append(w)
+                            top_corr[w_t] = w_corr
+                        else:
+                            top_corr[w_t] = w_corr
+        return top_corr
+
 
 CURRENT_DIR = os.getcwd()
 DATA_DIR = CURRENT_DIR + '/data/'
 TAGGED_FILENAME = 'NLPtask_manual_classification1.csv'
 DATA_FILENAME = 'NLPTask_Instagram_dataset.csv'
+W2V_MODEL_PATH = '/home/rtwik/Downloads/GoogleNews-vectors-negative300.bin'
 
 data_insta = pd.read_csv(DATA_DIR + DATA_FILENAME, error_bad_lines=False)
 data_insta = data_insta.dropna()
@@ -83,16 +100,27 @@ col_label = 'text'
 locations = set(data_insta['Park;;;'])
 PROC = preprocess()
 
+print('Loading W2V model')
+model = gensim.models.KeyedVectors.load_word2vec_format(W2V_MODEL_PATH, binary=True)
+
 top_words = {}
+words_corr = {}
 freqs = []
 for loc in locations:
     data = data_insta[data_insta['Park;;;'] == loc]
-    freqs.append(PROC.calculate_word_freq(data, col_label))
+
+    f = PROC.calculate_word_freq(data, col_label)
+    freqs.append(f)
+
     top_words[loc] = PROC.get_top_words(data, col_label, 10)
+
+    words_corr[loc] = PROC.get_correlated_words(top_words[loc], f, model)
     print(loc, len(data))
 
 top_words['all'] = PROC.get_top_words(data_insta, col_label, 10)
 count = sum((Counter(y) for y in freqs), Counter())
-sorted_freq1 = sorted((value, key) for (key,value) in count.items())
+sorted_freq1 = sorted((value, key) for (key, value) in count.items())
 top_words['all_norm'] = sorted_freq1[-10:]
+
 #data_tagged = pd.read_csv(DATA_DIR + TAGGED_FILENAME)
+
