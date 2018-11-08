@@ -47,6 +47,7 @@ class preprocess(object):
             return words
 
     def join_all_text_in_col(self, data_frame, col_label):
+        data_frame[col_label] = data_frame[col_label].apply(lambda x: str(x))
         return ' '.join(data_frame[col_label])
 
     def count_words(self, word_list, normalise=True):
@@ -86,41 +87,41 @@ class preprocess(object):
         return top_corr
 
 
-CURRENT_DIR = os.getcwd()
-DATA_DIR = CURRENT_DIR + '/data/'
-TAGGED_FILENAME = 'NLPtask_manual_classification1.csv'
-DATA_FILENAME = 'NLPTask_Instagram_dataset.csv'
-W2V_MODEL_PATH = '/home/rtwik/Downloads/GoogleNews-vectors-negative300.bin'
+if __name__ == '__main__':
+    CURRENT_DIR = os.getcwd()
+    DATA_DIR = CURRENT_DIR + '/data/'
+    TAGGED_FILENAME = 'NLPtask_manual_classification1.csv'
+    DATA_FILENAME = 'NLPTask_Instagram_dataset.csv'
+    W2V_MODEL_PATH = '/home/rtwik/Downloads/GoogleNews-vectors-negative300.bin'
 
-data_insta = pd.read_csv(DATA_DIR + DATA_FILENAME, error_bad_lines=False)
-data_insta = data_insta.dropna()
-data_insta['Park;;;'] = data_insta['Park;;;'].apply(lambda x: re.sub("[^a-zA-Z0-9]", "", x))
+    data_insta = pd.read_csv(DATA_DIR + DATA_FILENAME, error_bad_lines=False)
+    data_insta = data_insta.dropna()
+    data_insta['Park;;;'] = data_insta['Park;;;'].apply(lambda x: re.sub("[^a-zA-Z0-9]", "", x))
 
-col_label = 'text'
-locations = set(data_insta['Park;;;'])
-PROC = preprocess()
+    col_label = 'text'
+    locations = set(data_insta['Park;;;'])
+    PROC = preprocess()
 
-print('Loading W2V model')
-model = gensim.models.KeyedVectors.load_word2vec_format(W2V_MODEL_PATH, binary=True)
+    print('Loading W2V model')
+    model = gensim.models.KeyedVectors.load_word2vec_format(W2V_MODEL_PATH, binary=True)
 
-top_words = {}
-words_corr = {}
-freqs = []
-for loc in locations:
-    data = data_insta[data_insta['Park;;;'] == loc]
+    top_words = {}
+    words_corr = {}
+    freqs = []
+    for loc in locations:
+        data = data_insta[data_insta['Park;;;'] == loc]
 
-    f = PROC.calculate_word_freq(data, col_label)
-    freqs.append(f)
+        f = PROC.calculate_word_freq(data, col_label)
+        freqs.append(f)
 
-    top_words[loc] = PROC.get_top_words(data, col_label, 10)
+        top_words[loc] = PROC.get_top_words(data, col_label, 10)
 
-    words_corr[loc] = PROC.get_correlated_words(top_words[loc], f, model)
-    print(loc, len(data))
+        words_corr[loc] = PROC.get_correlated_words(top_words[loc], f, model)
+        print(loc, len(data))
 
-top_words['all'] = PROC.get_top_words(data_insta, col_label, 10)
-count = sum((Counter(y) for y in freqs), Counter())
-sorted_freq1 = sorted((value, key) for (key, value) in count.items())
-top_words['all_norm'] = sorted_freq1[-10:]
+    top_words['all'] = PROC.get_top_words(data_insta, col_label, 10)
+    count = sum((Counter(y) for y in freqs), Counter())
+    sorted_freq1 = sorted((value, key) for (key, value) in count.items())
+    top_words['all_norm'] = sorted_freq1[-10:]
 
-#data_tagged = pd.read_csv(DATA_DIR + TAGGED_FILENAME)
 
