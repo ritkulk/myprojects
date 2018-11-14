@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Nov  8 19:10:54 2018
-
+Implementation of a sentiment analysis model. The model used here has been trained
+on IMDB sentiment data and the best performing model on the test set is saved
+and used here.
 @author: rtwik
 """
 
@@ -17,7 +19,8 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 def get_mertrics(targets, predictions, upper_bound, lower_bound):
-
+    '''calculates precision, recall, fscore. labels = [], defines the desired labels
+        and their order to retuern'''
     predicitons[predicitons > upper_bound] = 1
     predicitons[predicitons < lower_bound] = 0
     predicitons[(predicitons >= lower_bound) & (predicitons <= upper_bound)] = 2
@@ -33,14 +36,15 @@ def get_mertrics(targets, predictions, upper_bound, lower_bound):
 CURRENT_DIR = os.getcwd()
 DATA_DIR = CURRENT_DIR + '/data/'
 MODELS_DIR = CURRENT_DIR + '/models/'
-MODEL_FILENAME = 'sentiment_basic.h5'
+MODEL_FILENAME = 'sentiment_basic.h5'  # saved model trained on IMDB data
 TAGGED_FILENAME = 'NLPtask_manual_classification1.csv'
 DATA_FILENAME = 'NLPTask_Instagram_dataset.csv'
-WORD_INDEX_FILENAME = 'word_index'
+WORD_INDEX_FILENAME = 'word_index' # _pickle file containing map of word to id for trained IMDB model
 col_label = 'text'
 
 
 def vectorise_text(sent, PROC):
+    '''transform text into vectors for the model'''
     words = PROC.alphanumeric_and_split_text(sent)
     vec = numpy.array([word_index[word] if word in word_index else 0 for word in words])
     vec = sequence.pad_sequences([vec], maxlen=500)
@@ -56,10 +60,9 @@ with open(DATA_DIR + WORD_INDEX_FILENAME, 'rb') as f:
 
 model = load_model(MODELS_DIR + MODEL_FILENAME)
 
-text = 'I have a great beautiful time.'
-
 PROC = preprocess()
 
+# calculate the overlap between model vocab and data vocab
 freq = PROC.calculate_word_freq(data_tagged, col_label)
 vocab = set([w for w in freq])
 vocab_train = set([w for w in word_index])
@@ -70,7 +73,7 @@ inputs = []
 for sent in data_tagged[col_label]:
     inputs.append(vectorise_text(sent, PROC))
 
-predicitons = model.predict(numpy.vstack(inputs))
+predicitons = model.predict(numpy.vstack(inputs)) # gets predictions for inputs
 
 print(numpy.max(predicitons), numpy.min(predicitons), numpy.mean(predicitons), numpy.std(predicitons))
 

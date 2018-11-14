@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Nov  7 18:44:01 2018
-
+Implements an LDA model for topic modelling. Preplexity is used to determine
+optimal number of topics.
 @author: rtwik
 """
 
@@ -26,6 +27,8 @@ DATA_DIR = CURRENT_DIR + '/data/'
 TAGGED_FILENAME = 'NLPtask_manual_classification1.csv'
 DATA_FILENAME = 'NLPTask_Instagram_dataset.csv'
 
+
+# define stopwords for exclusion
 stops =  set(stopwords.words('english'))
 stops_extra = ["south", "vscocam",
                "africa", "instagood", "point", "hope", "cape", "capeofgoodhope",
@@ -39,6 +42,7 @@ stops_extra = ["south", "vscocam",
 stops = stops | set(stops_extra)
 
 
+# prepare data
 data_insta = pd.read_csv(DATA_DIR + DATA_FILENAME, error_bad_lines=False)
 data_insta = data_insta.dropna()
 data_insta['Park;;;'] = data_insta['Park;;;'].apply(lambda x: re.sub("[^a-zA-Z0-9]", "", x))
@@ -47,8 +51,8 @@ data_insta['Park;;;'] = data_insta['Park;;;'].apply(lambda x: re.sub("[^a-zA-Z0-
 
 locations = set(data_insta['Park;;;'])
 
-n_features = 50
-n_top_words = 10
+n_features = 50  # feature dimension for vectoriser
+n_top_words = 10  # number of top n words to extract
 for loc in locations:
     data = data_insta[data_insta['Park;;;'] == loc]
 
@@ -58,7 +62,7 @@ for loc in locations:
     tf = tf_vectorizer.fit_transform(documents)
     tf_feature_names = tf_vectorizer.get_feature_names()
 
-    n_topics = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40]
+    n_topics = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40] # number of topics
 
     perp = numpy.zeros((len(n_topics), 2))
     topics = {}

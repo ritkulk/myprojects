@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Nov  4 23:55:06 2018
-
+This code implements a word frequency calculation for Instagram data on
+4 national parks in South Africa
 @author: rtwik
 """
 
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     locations = set(data_insta['Park;;;'])
     PROC = preprocess()
 
-    print('Loading W2V model')
+    print('Loading W2V model') # gensim model
     model = gensim.models.KeyedVectors.load_word2vec_format(W2V_MODEL_PATH, binary=True)
 
     top_words = {}
@@ -117,11 +118,10 @@ if __name__ == '__main__':
         top_words[loc] = PROC.get_top_words(data, col_label, 10)
 
         words_corr[loc] = PROC.get_correlated_words(top_words[loc], f, model)
-        print(loc, len(data))
+        print(loc, len(data), len(f))
 
     top_words['all'] = PROC.get_top_words(data_insta, col_label, 10)
-    count = sum((Counter(y) for y in freqs), Counter())
+    count = sum((Counter(y) for y in freqs), Counter()) # combines dictionaries and sums common keys
     sorted_freq1 = sorted((value, key) for (key, value) in count.items())
     top_words['all_norm'] = sorted_freq1[-10:]
-
 
