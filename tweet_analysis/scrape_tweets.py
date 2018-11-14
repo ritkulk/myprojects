@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov  9 17:02:48 2018
+script to scrape tweets related to a particular keyword and download
+associated images with it
 
 @author: rtwik
 """
@@ -22,10 +23,10 @@ IMG_DIR = '/mnt/mydisk/wdat/data_images/tweet_images/'
 
 
 ####input your credentials here
-consumer_key = 'V1XlezzNHQ1yyNFVxMET8nqzy'
-consumer_secret = 'phSCZsXLyaH4PauYDI8mAYpV2780VBxMnQJSxWCVXllhQ5TF2c'
-access_token = '1059141396697878529-aOtVjOuv3fB0o3rBXuJD4rnVKqUPo4'
-access_token_secret = 'ENpzCzJ4DScRxRRyOxtCiy32ohGH9lrkPhYzAdO4ungNU'
+consumer_key = 'XXXX'
+consumer_secret = 'XXXX'
+access_token = 'XXXX'
+access_token_secret = 'XXXX'
 
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
@@ -36,7 +37,8 @@ media_files = []
 print('fetching tweets')
 tweet_id = 0
 tweet_data = []
-for tweet in tweepy.Cursor(api.search,q="pangolin",count=1000,
+keyword = 'pangolin'
+for tweet in tweepy.Cursor(api.search,q=keyword,count=1000,
                            lang="en",
                            since="2017-01-01").items():
 

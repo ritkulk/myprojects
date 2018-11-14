@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov 11 16:57:40 2018
-
+Data preprocessing classes that handle the entire pipeline from obtaining
+raw data to fedding the vectors to the model, to calculating evaluation metrics
 @author: rtwik
 """
 
@@ -19,12 +19,12 @@ class preprocess(object):
         pass
 
     def vectorize_data(self, data_X, data_Y, params):
-        # transforms sentences into vectors
+        ''' transforms sentences into vectors'''
 
         return (numpy.vstack(data_X), numpy.array(data_Y, dtype=int))
 
     def make_train_test_split(self, data_frame, ratio):
-        # splits the data into train and test
+        '''splits the data into train and test'''
         data_frame = data_frame.sample(frac=1)
         data_train = data_frame.iloc[:int(len(data_frame)*ratio)]
         data_test = data_frame.iloc[int(len(data_frame)*ratio):]
@@ -32,7 +32,7 @@ class preprocess(object):
         return data_train, data_test
 
     def get_targets_for_eval(self, data_iter, stop_len):
-        # gets targets to evaluate metrics over predictions
+        '''gets targets to evaluate metrics over predictions'''
         targets = []
         for i in data_iter:
             targets = targets + list(i[1])
@@ -41,6 +41,7 @@ class preprocess(object):
         return targets
 
     def prepare_and_save_train_test_data(self, data_frame, params):
+        ''' saves train test splits to csv'''
         ratio = params['train_split_ratio']
         DATA_DIR = params['data_dir']
 
@@ -54,7 +55,7 @@ class preprocess(object):
 
 
 class data_gen(preprocess):
-    # iterator object to stream data to the model
+    ''' iterator object to stream data to the model'''
     def __init__(self, data_filepath, mode, params):
         preprocess.__init__(self)
         self.data_filepath = data_filepath
@@ -83,7 +84,7 @@ class data_gen(preprocess):
 
 
 class binary_labelled_data(preprocess):
-    # creates binary labels for subjective and objective data
+    ''' creates binary labels for subjective and objective data'''
     def __init__(self):
         preprocess.__init__(self)
 
@@ -115,7 +116,7 @@ class binary_labelled_data(preprocess):
 
 
 class metrics(object):
-    # module to get precision, recall and fscore over predictions
+    ''' module to get precision, recall and fscore over predictions'''
     def __init__(self):
         pass
 

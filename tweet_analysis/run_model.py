@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov 11 17:49:33 2018
-
+The code trains an image recognition model to detect pangolin images scraped
+from tweets. Inputs are extracted from VGG16 model.
 @author: rtwik
 """
 
@@ -14,7 +14,7 @@ import pandas as pd
 import ast
 
 def train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func):
-    # train, evaluate and save best model..
+    ''' train, evaluate and save best model'''
 
     dg_train = data_gen(TRAIN_FILEPATH, 'train', params)
     dg_test = data_gen(TEST_FILEPATH, 'test', params)
@@ -71,7 +71,7 @@ params = {'batch_size': 10,
 
 
 #--------train,test,save model---------
-score = train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func)
+#score = train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func)
 
 model = model_func.load_saved_model(params['model_filepath'])
 
@@ -85,7 +85,7 @@ for _, rows in data_predict.iterrows():
 
     predictions[rows['name']] = model.predict(x)
 
-    if c % 500 == 0:
+    if c % 200 == 0:
         print('done prediction', c/len(data_predict))
     c += 1
 

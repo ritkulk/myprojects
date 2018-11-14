@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Nov 11 16:52:10 2018
-
+Contains methods for all model related functions, compiling, training, predictind
+and testing
 @author: rtwik
 """
 
@@ -17,7 +17,7 @@ class model_functions(object):
         pass
 
     def compile_model(self, params):
-        # builds a simple 2 layer feedforward model
+        ''' builds a simple 3 layer feedforward model'''
         n_features = params['n_features']
         n_outputs = 1
 
@@ -36,8 +36,8 @@ class model_functions(object):
         return model
 
     def train_model(self, model, train_data_gen, dev_data_gen, params):
-        # trains the model with data generator and saves best model based on
-        # validation accuracy
+        ''' trains the model with data generator and saves best model based on
+            validation accuracy '''
         n_chunks_train = params['n_chunks_train']
         n_chunks_test = params['n_chunks_test']
         epochs = params['epochs']

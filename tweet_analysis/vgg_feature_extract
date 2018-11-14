@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov  9 20:03:09 2018
-
+Code to extract VGG16 model features for a set of input images and save it
+to a csv
 @author: rtwik
 """
 
@@ -13,7 +14,6 @@ from keras.applications.vgg16 import preprocess_input
 import numpy as np
 import os
 import pandas as pd
-import ast
 
 CURRENT_DIR = os.getcwd()
 DATA_DIR = CURRENT_DIR + '/data/'
@@ -23,6 +23,7 @@ PANG_IMG_DIR = '/mnt/mydisk/wdat/data_images/pangolin/'
 RAND_IMG_DIR = '/mnt/mydisk/wdat/data_images/random/'
 
 
+# creates the model
 model = VGG16(weights='imagenet', include_top=False)
 
 data_dict = {'pang': PANG_IMG_DIR, 'rand': RAND_IMG_DIR, 'data_img': DATA_IMG_DIR}
@@ -30,6 +31,7 @@ data_dict = {'pang': PANG_IMG_DIR, 'rand': RAND_IMG_DIR, 'data_img': DATA_IMG_DI
 IMG_PATH = PANG_IMG_DIR
 
 def get_vgg_features(label, data_dict):
+    '''ouputs features for given input images'''
     IMG_PATH = data_dict[label]
     feature_data = []
     print('getting vgg features for {}'.format(label))
@@ -52,16 +54,8 @@ def get_vgg_features(label, data_dict):
     feature_data.columns = ['name', 'features']
     return  feature_data
 
-#for d in data_dict.keys():
-#    features = get_vgg_features(d, data_dict)
-#    SAVE_FILENAME = DATA_DIR + d + '_features.csv'
-#    features.to_csv(SAVE_FILENAME, index=False)
-#    print('saved {} features to {}'.format(d, SAVE_FILENAME))
-
-
-SAVE_FILENAME = DATA_DIR + 'pang_features.csv'
-
-data = pd.read_csv(SAVE_FILENAME)
-data['features'] = data['features'].apply(lambda x: ast.literal_eval(x))
-for i in data['features']:
-     print(len(i))
+for d in data_dict.keys():
+    features = get_vgg_features(d, data_dict)
+    SAVE_FILENAME = DATA_DIR + d + '_features.csv'
+    features.to_csv(SAVE_FILENAME, index=False)
+    print('saved {} features to {}'.format(d, SAVE_FILENAME))
