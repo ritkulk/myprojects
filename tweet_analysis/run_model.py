@@ -50,13 +50,16 @@ preprocessor = preprocess()
 bd = binary_labelled_data()
 met = metrics()
 model_func = model_functions()
+batch_size = 10
+train_steps = int(len(pd.read_csv(TRAIN_FILEPATH))/batch_size)
+test_steps = int(len(pd.read_csv(TEST_FILEPATH))/batch_size)
 
-params = {'batch_size': 10,
+params = {'batch_size': batch_size,
           'data_dir': DATA_DIR,
           'train_split_ratio': 0.9,
           'n_features': 25088,
-          'n_chunks_train': 17,
-          'n_chunks_test': 2,
+          'n_chunks_train': train_steps,
+          'n_chunks_test': test_steps,
           'model_filepath': MODELS_DIR + 'pangolin_classifier.h5',
           'model_type': 'cnn_lstm',  # 'cnn_lstm' or 'multi_cnn'
           'epochs': 50
@@ -71,7 +74,7 @@ params = {'batch_size': 10,
 
 
 #--------train,test,save model---------
-#score = train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func)
+score = train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func)
 
 model = model_func.load_saved_model(params['model_filepath'])
 

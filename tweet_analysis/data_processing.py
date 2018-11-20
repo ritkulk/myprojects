@@ -20,8 +20,14 @@ class preprocess(object):
 
     def vectorize_data(self, data_X, data_Y, params):
         ''' transforms sentences into vectors'''
+        x = []
+        for i in data_X:
+            if isinstance(i, str):
+                x.append(ast.literal_eval(i))
+            elif isinstance(i, list):
+                x.append(i)
 
-        return (numpy.vstack(data_X), numpy.array(data_Y, dtype=int))
+        return (numpy.vstack(x), numpy.array(data_Y, dtype=int))
 
     def make_train_test_split(self, data_frame, ratio):
         '''splits the data into train and test'''
@@ -62,25 +68,34 @@ class data_gen(preprocess):
         self.params = params
         self.batch_size = params['batch_size']
         self.mode = mode
+        self.count = 0
+        self.data =  pd.read_csv(self.data_filepath)
 
     def __iter__(self):
         return self
 
     def __next__(self):
 
-        for chunk in pd.read_csv(self.data_filepath,
-                                 chunksize=self.batch_size):
+        start = self.count * self.batch_size
+        end = (self.count + 1)* self.batch_size
 
+        if end > len(self.data):
+            start = len(self.data) - self.batch_size
+            end = len(self.data)
 
-            chunk['features'] = chunk['features'].apply(lambda x: ast.literal_eval(x))
+        chunk = self.data[start: end]
 
-            if self.mode == 'train' or self.mode == 'test':
-                X, Y = self.vectorize_data(chunk['features'], chunk['label'], self.params)
+        #chunk['features'] = chunk['features'].apply(lambda x: ast.literal_eval(x))
 
-                return (X, Y)
+        self.count += 1
 
-            if self.mode == 'predicit':
-                return numpy.vstack(chunk['features'])
+        if self.mode == 'train' or self.mode == 'test':
+            X, Y = self.vectorize_data(chunk['features'], chunk['label'], self.params)
+            del(chunk)
+            return (X, Y)
+
+        if self.mode == 'predicit':
+            return numpy.vstack(chunk['features'])
 
 
 class binary_labelled_data(preprocess):
