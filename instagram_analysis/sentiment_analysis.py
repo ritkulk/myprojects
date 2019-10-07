@@ -62,8 +62,10 @@ model = load_model(MODELS_DIR + MODEL_FILENAME)
 
 PROC = preprocess()
 
+gram_num = 1
 # calculate the overlap between model vocab and data vocab
-freq = PROC.calculate_word_freq(data_tagged, col_label)
+freq = PROC.calculate_word_freq(data_tagged, col_label, gram_num
+                                )
 vocab = set([w for w in freq])
 vocab_train = set([w for w in word_index])
 common_vocab = len(vocab.intersection(vocab_train))/len(vocab)

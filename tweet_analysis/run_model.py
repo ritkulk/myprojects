@@ -74,7 +74,7 @@ params = {'batch_size': batch_size,
 
 
 #--------train,test,save model---------
-score = train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func)
+#score = train_and_save_model(TRAIN_FILEPATH, TEST_FILEPATH, data_gen, model_func)
 
 model = model_func.load_saved_model(params['model_filepath'])
 
