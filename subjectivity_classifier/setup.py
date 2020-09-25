@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "Keras == 2.1.5",
-        "tensorflow == 1.6.0",
+        "tensorflow == 1.15.4",
         "pandas == 0.22.0",
         "nltk == 3.2.5",
         "scikit-learn == 0.19.1",
