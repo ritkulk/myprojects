@@ -16,7 +16,7 @@ setup(
         "Keras == 2.1.5",
         "tensorflow == 1.6.0",
         "pandas == 0.22.0",
-        "nltk == 3.2.5",
+        "nltk == 3.6.3",
         "scikit-learn == 0.19.1",
         "h5py == 2.7.1",
         "pyenchant == 1.6.10"
