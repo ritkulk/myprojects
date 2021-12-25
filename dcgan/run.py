@@ -157,6 +157,6 @@ ax2 = f.add_subplot(1,2,2)
 ax2.axis("off")
 ax2.set_title("Fake Images")
 ax2.imshow(np.transpose(img_list[-1],(1,2,0)))
-f.show()
 
 f.savefig(os.getcwd() + '/result_ep' + str(epoch) + '.png')
+# 

@@ -20,7 +20,7 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import numpy as np
-import matplotlib.pyplot as plt
+import pylab as plt
 import matplotlib.animation as animation
 from IPython.display import HTML
 
@@ -99,6 +99,24 @@ class ModelFunctions(object):
         optimiser_gen.step()
         
         return disc_out_fake2, errG
+    
+    def generate_images(self, generator, n_images, save_flag, config, device):
+        
+        fixed_noise = torch.randn(n_images, config['nz'], 1, 1, device=device)
+
+        output = generator(fixed_noise).detach().cpu()
+        
+        f1 = plt.figure(1)
+        ax1 = f1.add_subplot(111)
+        ax1.axis("off")
+        ax1.set_title('Generator Output')
+        ax1.imshow(np.transpose(output,(1,2,0)))
+
+        save_filename = os.getcwd() + '/result_' + str(save_flag) + '.png'
+        f1.savefig(save_filename)
+        print('Image result saved to {}'.format(save_filename))
+        
+        
 
 class Generator(nn.Module):
     
