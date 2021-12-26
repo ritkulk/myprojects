@@ -105,7 +105,7 @@ for epoch in range(start_epoch, start_epoch + config['num_epochs']):
         # Output training stats
         if i % 10 == 0:
             print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
-                  % (epoch, config['num_epochs'], i, len(data_loader),
+                  % (epoch, start_epoch + config['num_epochs'], i, len(data_loader),
                       err_disc.item(), err_gen.item(), disc_out_real, disc_out_fake, disc_out_fake2))
 
         # Save Losses for plotting later
