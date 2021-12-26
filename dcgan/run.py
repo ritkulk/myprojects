@@ -139,7 +139,7 @@ torch.save({
             'disc_optimizer_state_dict': optimiser_disc.state_dict(),
             'gen_err': G_losses[-1],
             'disc_err': D_losses[-1],
-            }, os.getcwd() + '/' + 'dcgan_ep' + str(epoch) + 'pt')
+            }, os.getcwd() + '/' + 'dcgan_ep' + str(epoch) + '.pt')
 
         
 # Grab a batch of real images from the dataloader
