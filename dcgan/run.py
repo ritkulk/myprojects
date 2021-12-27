@@ -28,6 +28,7 @@ parser.add_argument('--config', help='json for required parameters', type=str, r
 parser.add_argument('--data_path', help='folder with training images', type=str, required=True)
 parser.add_argument('--resume_trained', help='folder with training images', type=str, default='n', required=False)
 parser.add_argument('--model_path', help='path to saved model', type=str, required=False)
+parser.add_argument('--save_flag', help='flag to save model filename', type=str, required=False)
 args = parser.parse_args()
 
 
@@ -129,7 +130,7 @@ for epoch in range(start_epoch, start_epoch + config['num_epochs']):
                     'disc_optimizer_state_dict': optimiser_disc.state_dict(),
                     'gen_err': G_losses[-1],
                     'disc_err': D_losses[-1],
-                    }, os.getcwd() + '/' + 'dcgan_ep' + str(epoch) + '.pt')
+                    }, os.getcwd() + '/' + 'dcgan_ep' + str(epoch) + '_' + args.save_flag + '.pt')
 
 torch.save({
             'epoch': epoch,
@@ -139,7 +140,7 @@ torch.save({
             'disc_optimizer_state_dict': optimiser_disc.state_dict(),
             'gen_err': G_losses[-1],
             'disc_err': D_losses[-1],
-            }, os.getcwd() + '/' + 'dcgan_ep' + str(epoch) + '.pt')
+            }, os.getcwd() + '/' + 'dcgan_ep' + str(epoch) + '_' + args.save_flag + '.pt')
 
         
 # Grab a batch of real images from the dataloader
@@ -158,5 +159,5 @@ ax2.axis("off")
 ax2.set_title("Fake Images")
 ax2.imshow(np.transpose(img_list[-1],(1,2,0)))
 
-f.savefig(os.getcwd() + '/result_ep' + str(epoch) + '.png')
+f.savefig(os.getcwd() + '/result_ep' + str(epoch) + '_' + args.save_flag + '.png')
 # 
