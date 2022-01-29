@@ -43,7 +43,8 @@ generator.load_state_dict(checkpoint['gen_state_dict'])
 # MF.generate_images(generator, args.n_images, args.save_flag, config, device)
 
 
-fixed_noise = torch.randn(args.n_images, config['nz'], 1, 1, device=device)
+fixed_noise = torch.randn(args.n_images, config['nz'], 1, 1, device=device)*\
+    torch.rand(args.n_images, config['nz'], 1, 1, device=device)*5
 
 output = generator(fixed_noise).detach().cpu()
 result = vutils.make_grid(output, padding=2, normalize=True)

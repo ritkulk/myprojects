@@ -50,6 +50,8 @@ class ModelFunctions(object):
         label = torch.full((b_size,), config['real_label'], dtype=torch.float, device=device)
         # Forward pass real batch through D
         output = discriminator(real_cpu).view(-1)
+        # print(label.size(), output.size(), real_cpu.size())
+
         # Calculate loss on all-real batch
         errD_real = loss_function(output, label)
         # Calculate gradients for D in backward pass
