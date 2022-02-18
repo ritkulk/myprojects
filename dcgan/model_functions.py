@@ -42,10 +42,12 @@ class ModelFunctions(object):
             
     def train_discriminator(self, discriminator, generator, loss_function, optimiser_disc, optimiser_gen,
                             data, device, config):
-        ## Train with all-real batch
+        ## Train with all-real batch450*
         discriminator.zero_grad()
         # Format batch
-        real_cpu = data.to(device)
+        real_cpu = data.to(device) 
+        noise = torch.randn(real_cpu.size()).to(device)
+        real_cpu = real_cpu + noise*0.01*np.random.randint(0,2)
         b_size = real_cpu.size(0)
         label = torch.full((b_size,), config['real_label'], dtype=torch.float, device=device)
         # Forward pass real batch through D
@@ -125,33 +127,57 @@ class Generator(nn.Module):
     def __init__(self, config):
         super(Generator, self).__init__()
         self.ngpu = config['ngpu']
-        self.main = nn.Sequential(
-            # input is Z, going into a convolution
-            nn.ConvTranspose2d( config['nz'], config['ngf'] * 8, 4, 1, 0, bias=False),
-            nn.BatchNorm2d(config['ngf'] * 8),
-            nn.ReLU(True),
-            nn.Dropout(0.5),
-            # state size. (ngf*8) x 4 x 4
-            nn.ConvTranspose2d(config['ngf'] * 8, config['ngf'] * 4, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(config['ngf'] * 4),
-            nn.ReLU(True),
-            nn.Dropout(0.5),
-            # state size. (ngf*4) x 8 x 8
-            nn.ConvTranspose2d( config['ngf'] * 4, config['ngf'] * 2, 4, 2, 1, bias=False),
-            nn.BatchNorm2d(config['ngf'] * 2),
-            nn.ReLU(True),
-            nn.Dropout(0.5),
-            # state size. (ngf*2) x 16 x 16
-            nn.ConvTranspose2d( config['ngf'] * 2, config['ngf'], 4, 2, 1, bias=False),
-            nn.BatchNorm2d(config['ngf']),
-            nn.ReLU(True),
-            nn.Dropout(0.5),
-            # state size. (ngf) x 32 x 32
-            nn.ConvTranspose2d( config['ngf'], config['nc'], 4, 2, 1, bias=False),
-            nn.Tanh()
-            # state size. (nc) x 64  x 64
-        )
-
+        if config['use_dropout'] == True:
+            self.main = nn.Sequential(
+                # input is Z, going into a convolution
+                nn.ConvTranspose2d( config['nz'], config['ngf'] * 8, 4, 1, 0, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 8),
+                nn.ReLU(True),
+                nn.Dropout(0.5),
+                # state size. (ngf*8) x 4 x 4
+                nn.ConvTranspose2d(config['ngf'] * 8, config['ngf'] * 4, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 4),
+                nn.ReLU(True),
+                nn.Dropout(0.5),
+                # state size. (ngf*4) x 8 x 8
+                nn.ConvTranspose2d( config['ngf'] * 4, config['ngf'] * 2, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 2),
+                nn.ReLU(True),
+                nn.Dropout(0.5),
+                # state size. (ngf*2) x 16 x 16
+                nn.ConvTranspose2d( config['ngf'] * 2, config['ngf'], 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf']),
+                nn.ReLU(True),
+                nn.Dropout(0.5),
+                # state size. (ngf) x 32 x 32
+                nn.ConvTranspose2d( config['ngf'], config['nc'], 4, 2, 1, bias=False),
+                nn.Tanh()
+                # state size. (nc) x 64  x 64
+                )
+        else:
+            self.main = nn.Sequential(
+                # input is Z, going into a convolution
+                nn.ConvTranspose2d( config['nz'], config['ngf'] * 8, 4, 1, 0, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 8),
+                nn.ReLU(True),
+                # state size. (ngf*8) x 4 x 4
+                nn.ConvTranspose2d(config['ngf'] * 8, config['ngf'] * 4, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 4),
+                nn.ReLU(True),
+                # state size. (ngf*4) x 8 x 8
+                nn.ConvTranspose2d( config['ngf'] * 4, config['ngf'] * 2, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 2),
+                nn.ReLU(True),
+                # state size. (ngf*2) x 16 x 16
+                nn.ConvTranspose2d( config['ngf'] * 2, config['ngf'], 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf']),
+                nn.ReLU(True),
+                # state size. (ngf) x 32 x 32
+                nn.ConvTranspose2d( config['ngf'], config['nc'], 4, 2, 1, bias=False),
+                nn.Tanh()
+                # state size. (nc) x 64  x 64
+                )
+                
     def forward(self, input):
         return self.main(input)
 
@@ -189,6 +215,116 @@ class Discriminator(nn.Module):
     def forward(self, input):
         return self.main(input)
 
+
+class Generator128(nn.Module):
+    def __init__(self, config):
+        super(Generator128, self).__init__()
+        self.ngpu = config['ngpu']
+        if config['use_dropout'] == True:
+            self.main = nn.Sequential(
+                # input is Z, going into a convolution
+                nn.ConvTranspose2d( config['nz'], config['ngf'] * 16, 4, 1, 0, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 16),
+                nn.ReLU(True),
+                nn.Dropout(0.3),
+        
+                nn.ConvTranspose2d( config['ngf'] * 16, config['ngf'] * 8, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 8),
+                nn.ReLU(True),
+                nn.Dropout(0.3),
+                # state size. (ngf*8) x 4 x 4
+                nn.ConvTranspose2d(config['ngf'] * 8, config['ngf'] * 4, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 4),
+                nn.ReLU(True),
+                nn.Dropout(0.3),
+                # state size. (ngf*4) x 8 x 8
+                nn.ConvTranspose2d( config['ngf'] * 4, config['ngf'] * 2, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 2),
+                nn.ReLU(True),
+                nn.Dropout(0.3),
+                # state size. (ngf*2) x 16 x 16
+                nn.ConvTranspose2d( config['ngf'] * 2, config['ngf'], 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf']),
+                nn.ReLU(True),
+                nn.Dropout(0.3),
+                # state size. (ngf) x 32 x 32
+                nn.ConvTranspose2d( config['ngf'], config['nc'], 4, 2, 1, bias=False),
+                nn.Tanh()
+                # state size. (nc) x 64  x 64
+                )
+        else:
+            self.main = nn.Sequential(
+                # input is Z, going into a convolution
+                nn.ConvTranspose2d( config['nz'], config['ngf'] * 16, 4, 1, 0, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 16),
+                nn.ReLU(True),
+        
+                nn.ConvTranspose2d(config['ngf'] * 16, config['ngf'] * 8, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 8),
+                nn.ReLU(True),
+
+                # state size. (ngf*8) x 4 x 4
+                nn.ConvTranspose2d(config['ngf'] * 8, config['ngf'] * 4, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 4),
+                nn.ReLU(True),
+
+                # state size. (ngf*4) x 8 x 8
+                nn.ConvTranspose2d( config['ngf'] * 4, config['ngf'] * 2, 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf'] * 2),
+                nn.ReLU(True),
+
+                # state size. (ngf*2) x 16 x 16
+                nn.ConvTranspose2d( config['ngf'] * 2, config['ngf'], 4, 2, 1, bias=False),
+                nn.BatchNorm2d(config['ngf']),
+                nn.ReLU(True),
+
+                # state size. (ngf) x 32 x 32
+                nn.ConvTranspose2d( config['ngf'], config['nc'], 4, 2, 1, bias=False),
+                nn.Tanh()
+                # state size. (nc) x 64  x 64
+                )
+
+    def forward(self, input):
+        return self.main(input)
+
+class Discriminator128(nn.Module):
+    
+    def __init__(self, config):
+        super(Discriminator128, self).__init__()
+        self.ngpu = config['ngpu']
+        self.main = nn.Sequential(
+            # input is (nc) x 128 x 128
+            nn.Conv2d(config['nc'], config['ndf'], 4, 2, 1, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.3),
+            # state size. (ndf) x 32 x 32
+            nn.Conv2d(config['ndf'], config['ndf'] * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(config['ndf'] * 2),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.3),
+            # state size. (ndf*2) x 16 x 16
+            nn.Conv2d(config['ndf'] * 2, config['ndf'] * 4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(config['ndf'] * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.3),
+            # state size. (ndf*4) x 8 x 8
+            nn.Conv2d(config['ndf'] * 4, config['ndf'] * 8, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(config['ndf'] * 8),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.3),
+            # state size. (ndf*8) x 4 x 4
+            nn.Conv2d(config['ndf'] * 8,  config['ndf'] * 16, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(config['ndf'] * 16),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Dropout(0.3),
+            
+            nn.Conv2d(config['ndf'] * 16, 1, 4, 1, 0, bias=False),
+            nn.Sigmoid()
+        )
+
+    def forward(self, input):
+        return self.main(input)
+            
 class ImageModels(ModelFunctions):
     
     def __init__(self, model_path):

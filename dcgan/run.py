@@ -18,8 +18,8 @@ import numpy as np
 import torchvision.utils as vutils
 from torchvision import transforms
 from model_functions import ModelFunctions
-from model_functions import Generator
-from model_functions import Discriminator
+from model_functions import Generator128
+from model_functions import Discriminator128
 from data_processor import DataProcessor, ImageDataset
 
 
@@ -42,10 +42,10 @@ DP = DataProcessor()
 device = torch.device("cuda:0" if (torch.cuda.is_available() and config['ngpu'] > 0) else "cpu")
 # device = 'cpu'
 
-generator = Generator(config).to(device)
+generator = Generator128(config).to(device)
 generator.apply(MF.weights_init)
 
-discriminator = Discriminator(config).to(device)
+discriminator = Discriminator128(config).to(device)
 discriminator.apply(MF.weights_init)
 
 loss_function = nn.BCELoss()
