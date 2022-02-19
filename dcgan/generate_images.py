@@ -14,7 +14,7 @@ import pylab as plt
 import numpy as np
 import torchvision.utils as vutils
 from model_functions import ModelFunctions
-from model_functions import Generator
+from model_functions import Generator128
 from data_processor import DataProcessor, ImageDataset
 
 
@@ -36,7 +36,7 @@ MF = ModelFunctions()
 device = torch.device("cuda:0" if (torch.cuda.is_available() and config['ngpu'] > 0) else "cpu")
 # device = 'cpu'
 
-generator = Generator(config).to(device)
+generator = Generator128(config).to(device)
 checkpoint = torch.load(args.model_path)
 generator.load_state_dict(checkpoint['gen_state_dict'])
 
